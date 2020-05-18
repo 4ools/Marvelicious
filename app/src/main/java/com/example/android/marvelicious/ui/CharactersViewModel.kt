@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.*
 import com.example.android.marvelicious.data.source.database.getDatabase
 import com.example.android.marvelicious.domain.Models
-import com.example.android.marvelicious.data.source.Repository
+import com.example.android.marvelicious.data.source.MarveliciousRepository
 import com.example.android.marvelicious.data.source.database.LocalDataSource
 import com.example.android.marvelicious.data.source.network.RemoteDataSource
 import kotlinx.coroutines.*
@@ -16,7 +16,7 @@ class CharactersViewModel(application: Application) : AndroidViewModel(applicati
     private val viewModelScope = CoroutineScope(viewModelJob + Dispatchers.Main)
 
     private val repository =
-        Repository(
+        MarveliciousRepository(
             RemoteDataSource(),
             LocalDataSource(getDatabase(application).charactersDao)
         )
