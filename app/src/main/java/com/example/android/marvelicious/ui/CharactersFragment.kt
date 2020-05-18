@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.marvelicious.R
 import com.example.android.marvelicious.databinding.FragmentCharactersBinding
-import timber.log.Timber
 
 class CharactersFragment : Fragment() {
 
@@ -38,10 +37,12 @@ class CharactersFragment : Fragment() {
             false
         )
         binding.lifecycleOwner = this
+        binding.viewModel = charactersViewModel
 
         adapter = CharactersDataAdapter(CharacterClick {
             Toast.makeText(activity, "character called ${it.name}", Toast.LENGTH_SHORT).show()
         })
+
         binding.charactersList.adapter = adapter
         binding.charactersList.layoutManager = LinearLayoutManager(context)
 
@@ -51,8 +52,20 @@ class CharactersFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         charactersViewModel.characters.observe(viewLifecycleOwner, Observer {
-            Timber.i("returned the character ${it.size}")
             adapter.submitList(it)
         })
+
+        charactersViewModel.eventNetworkError.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                onNetworkError()
+            }
+        })
+    }
+
+    private fun onNetworkError() {
+        if (!charactersViewModel.isNetworkErrorShown.value!!) {
+            Toast.makeText(activity, "Network Error", Toast.LENGTH_LONG).show()
+            charactersViewModel.onNetworkErrorShown()
+        }
     }
 }

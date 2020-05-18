@@ -5,10 +5,7 @@ import androidx.lifecycle.*
 import com.example.android.marvelicious.database.getDatabase
 import com.example.android.marvelicious.domain.Models
 import com.example.android.marvelicious.repository.Repository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.IOException
 
@@ -22,11 +19,11 @@ class CharactersViewModel(application: Application) : AndroidViewModel(applicati
     val characters: LiveData<List<Models.Character>>
         get() = _characters
 
-    private var _eventNetworkError = MutableLiveData<Boolean>(false)
+    private var _eventNetworkError = MutableLiveData(false)
     val eventNetworkError: LiveData<Boolean>
         get() = _eventNetworkError
 
-    private var _isNetworkErrorShown = MutableLiveData<Boolean>(false)
+    private var _isNetworkErrorShown = MutableLiveData(false)
     val isNetworkErrorShown: LiveData<Boolean>
         get() = _isNetworkErrorShown
 
@@ -42,10 +39,16 @@ class CharactersViewModel(application: Application) : AndroidViewModel(applicati
                 _isNetworkErrorShown.value = false
             } catch (networkError: IOException) {
                 Timber.e(networkError)
-                if (characters.value == null)
+                if (characters.value.isNullOrEmpty()) {
                     _eventNetworkError.value = true
+                }
             }
         }
+    }
+
+
+    fun onNetworkErrorShown() {
+        _isNetworkErrorShown.value = true
     }
 
     /**
