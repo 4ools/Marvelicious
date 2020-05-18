@@ -88,8 +88,9 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:4.7.1'
 
     // glide for images
-    implementation 'com.github.bumptech.glide:glide:4.8.0'
-    kapt 'com.github.bumptech.glide:compiler:4.8.0'
+    def glide_version = "4.11.0"
+    implementation "com.github.bumptech.glide:glide:$glide_version"
+    kapt "com.github.bumptech.glide:compiler:$glide_version"
 
     // Room dependency
     def room_version = "2.2.5"

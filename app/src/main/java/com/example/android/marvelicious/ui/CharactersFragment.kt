@@ -8,7 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.marvelicious.R
 import com.example.android.marvelicious.databinding.FragmentCharactersBinding
 import timber.log.Timber
@@ -23,6 +23,8 @@ class CharactersFragment : Fragment() {
         ).get(CharactersViewModel::class.java)
     }
 
+    private lateinit var adapter: CharactersDataAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -34,7 +36,12 @@ class CharactersFragment : Fragment() {
             container,
             false
         )
-        binding.lifecycleOwner = viewLifecycleOwner
+        binding.lifecycleOwner = this
+
+        adapter = CharactersDataAdapter()
+        binding.charactersList.adapter = adapter
+        binding.charactersList.layoutManager = LinearLayoutManager(context)
+
         return binding.root
     }
 
@@ -42,6 +49,7 @@ class CharactersFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         charactersViewModel.characters.observe(viewLifecycleOwner, Observer {
             Timber.i("returned the character ${it.size}")
+            adapter.submitList(it)
         })
     }
 }
