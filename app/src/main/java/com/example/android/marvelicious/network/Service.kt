@@ -23,7 +23,7 @@ interface MarveliciousService {
         @Query("orderBy") orderBy: String = "name",
         @Query("limit") limit: Int?,
         @Query("offset") offset: Int?
-    ): Deferred<DataTransferObject.CharacterDataWrapper>
+    ): Deferred<CharacterDataWrapper>
 
     companion object {
         private const val BASE_URL = "https://gateway.marvel.com/"

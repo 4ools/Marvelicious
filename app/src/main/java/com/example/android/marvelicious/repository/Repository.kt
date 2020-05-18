@@ -1,9 +1,9 @@
 package com.example.android.marvelicious.repository
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.android.marvelicious.network.DataTransferObject
+import com.example.android.marvelicious.domain.Models
 import com.example.android.marvelicious.network.MarveliciousService
+import com.example.android.marvelicious.network.asCharacterDomainModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -13,7 +13,7 @@ class Repository {
         MarveliciousService.create()
     }
 
-    var characters = MutableLiveData<DataTransferObject.CharacterDataWrapper>()
+    var characters = MutableLiveData<List<Models.Character>>()
 
     suspend fun refreshCharacters() {
         withContext(Dispatchers.IO) {
@@ -23,7 +23,7 @@ class Repository {
                 offset = 0
             ).await()
             Timber.d("the size returned is ${returnedCharacters.data?.results?.size}")
-            characters.postValue(returnedCharacters)
+            characters.postValue(returnedCharacters.asCharacterDomainModel())
         }
     }
 }

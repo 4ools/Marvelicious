@@ -35,14 +35,13 @@ class CharactersFragment : Fragment() {
             false
         )
         binding.lifecycleOwner = viewLifecycleOwner
-        charactersViewModel.characters.observe(viewLifecycleOwner,  Observer {
-            Timber.i("returned the character ${it.data?.results?.size}")
-        })
-
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        charactersViewModel.characters.observe(viewLifecycleOwner, Observer {
+            Timber.i("returned the character ${it.size}")
+        })
     }
 }

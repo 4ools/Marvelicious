@@ -2,7 +2,7 @@ package com.example.android.marvelicious.ui
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.example.android.marvelicious.network.DataTransferObject.CharacterDataWrapper
+import com.example.android.marvelicious.domain.Models
 import com.example.android.marvelicious.repository.Repository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,9 +17,8 @@ class CharactersViewModel(application: Application) : AndroidViewModel(applicati
 
     private val repository = Repository()
 
-//    private var _characters = MutableLiveData<CharacterDataWrapper>()
     private var _characters = repository.characters
-    val characters: LiveData<CharacterDataWrapper>
+    val characters: LiveData<List<Models.Character>>
         get() = _characters
 
     private var _eventNetworkError = MutableLiveData<Boolean>(false)
