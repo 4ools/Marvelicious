@@ -13,8 +13,9 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
-
+        multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
@@ -22,6 +23,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+
+    dataBinding {
+        enabled = true
     }
 
 }
@@ -75,7 +80,7 @@ dependencies {
 
     // glide for images
     implementation 'com.github.bumptech.glide:glide:4.8.0'
-    kapt 'com.github.bumptech.glide:compiler:4.7.1'
+    kapt 'com.github.bumptech.glide:compiler:4.8.0'
 
     // Room dependency
     def room_version = "2.2.5"
@@ -94,4 +99,7 @@ dependencies {
 
     // Espresso
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    // MultiDex
+    implementation 'androidx.multidex:multidex:2.0.1'
 }
