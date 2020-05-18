@@ -19,7 +19,7 @@ import timber.log.Timber
 
 interface MarveliciousService {
     @GET("/v1/public/characters")
-    fun getAllCharacters(
+    fun getAllCharactersAsync(
         @Query("orderBy") orderBy: String = "name",
         @Query("limit") limit: Int?,
         @Query("offset") offset: Int?
