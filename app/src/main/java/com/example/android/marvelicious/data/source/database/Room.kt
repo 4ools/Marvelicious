@@ -14,8 +14,11 @@ interface CharactersDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(characters: List<DatabaseCharacter>)
 
-    @Query("SELECT * FROM databasecharacter ORDER BY name ASC")
+    @Query("SELECT * FROM character ORDER BY name ASC")
     fun getAllCharacters(): LiveData<List<DatabaseCharacter>>
+
+    @Query("SELECT * FROM character ORDER BY name ASC")
+    fun getChars(): List<DatabaseCharacter>
 }
 
 private lateinit var INSTANCE: MarveliciousDatabase

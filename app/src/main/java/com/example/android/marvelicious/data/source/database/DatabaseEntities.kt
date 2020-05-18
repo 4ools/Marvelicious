@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import com.example.android.marvelicious.domain.Models
 
 
-@Entity
+@Entity(tableName = "character")
 data class DatabaseCharacter constructor(
     @PrimaryKey
     val id: Int,

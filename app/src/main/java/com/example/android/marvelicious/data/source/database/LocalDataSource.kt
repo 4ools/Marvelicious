@@ -7,19 +7,28 @@ import com.example.android.marvelicious.domain.Models
 import com.example.android.marvelicious.domain.asDatabaseModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class LocalDataSource(
     private val charactersDao: CharactersDao,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : DataSource {
 
-    override fun getCharacters(): LiveData<List<Models.Character>> {
+    override fun observeCharacters(): LiveData<List<Models.Character>> {
         return Transformations.map(charactersDao.getAllCharacters()) {
             it.asDomainModel()
         }
     }
 
-    override fun insertAll(characters: List<Models.Character>) {
+    override suspend fun refreshCharacters() {
+        throw NotImplementedError()
+    }
+
+    override suspend fun saveCharacters(characters: List<Models.Character>) = withContext(ioDispatcher) {
         charactersDao.insertAll(characters.asDatabaseModel()!!)
+    }
+
+    override suspend fun getCharacters(): List<Models.Character> = withContext(ioDispatcher) {
+        return@withContext charactersDao.getChars().asDomainModel()
     }
 }

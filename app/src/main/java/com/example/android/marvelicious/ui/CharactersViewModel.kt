@@ -6,6 +6,7 @@ import com.example.android.marvelicious.data.source.database.getDatabase
 import com.example.android.marvelicious.domain.Models
 import com.example.android.marvelicious.data.source.Repository
 import com.example.android.marvelicious.data.source.database.LocalDataSource
+import com.example.android.marvelicious.data.source.network.RemoteDataSource
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.IOException
@@ -15,9 +16,12 @@ class CharactersViewModel(application: Application) : AndroidViewModel(applicati
     private val viewModelScope = CoroutineScope(viewModelJob + Dispatchers.Main)
 
     private val repository =
-        Repository(LocalDataSource(getDatabase(application).charactersDao))
+        Repository(
+            RemoteDataSource(),
+            LocalDataSource(getDatabase(application).charactersDao)
+        )
 
-    private var _characters = repository.characters
+    private var _characters = repository.observeCharacters()
     val characters: LiveData<List<Models.Character>>
         get() = _characters
 
@@ -26,6 +30,7 @@ class CharactersViewModel(application: Application) : AndroidViewModel(applicati
         get() = _eventNetworkError
 
     private var _isNetworkErrorShown = MutableLiveData(false)
+
     val isNetworkErrorShown: LiveData<Boolean>
         get() = _isNetworkErrorShown
 
@@ -36,7 +41,7 @@ class CharactersViewModel(application: Application) : AndroidViewModel(applicati
     private fun refreshDataFromRepository() {
         viewModelScope.launch {
             try {
-                repository.refreshCharacters()
+                repository.getCharacters()
                 _eventNetworkError.value = false
                 _isNetworkErrorShown.value = false
             } catch (networkError: IOException) {

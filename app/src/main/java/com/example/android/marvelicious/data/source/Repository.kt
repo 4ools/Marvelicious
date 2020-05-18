@@ -1,25 +1,34 @@
 package com.example.android.marvelicious.data.source
 
+import androidx.lifecycle.LiveData
 import com.example.android.marvelicious.data.source.database.LocalDataSource
-import com.example.android.marvelicious.data.source.network.MarveliciousService
-import com.example.android.marvelicious.data.source.network.asCharacterDomainModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.example.android.marvelicious.data.source.network.RemoteDataSource
+import com.example.android.marvelicious.domain.Models
+import timber.log.Timber
 
-class Repository(private val localDataSource: LocalDataSource) {
-    private val marvelApi by lazy {
-        MarveliciousService.create()
+class Repository(
+    private val remoteDataSource: RemoteDataSource,
+    private val localDataSource: LocalDataSource
+) {
+    suspend fun getCharacters(): List<Models.Character> {
+        try {
+            updateCharactersFromRemoteDataSource()
+        } catch (ex: Exception) {
+            Timber.e(ex)
+        }
+        return localDataSource.getCharacters()
     }
 
-    var characters = localDataSource.getCharacters()
+    fun observeCharacters(): LiveData<List<Models.Character>> {
+        return localDataSource.observeCharacters()
+    }
 
     suspend fun refreshCharacters() {
-        withContext(Dispatchers.IO) {
-            val returnedCharacters = marvelApi.getAllCharactersAsync(
-                limit = 50,
-                offset = 0
-            ).await()
-            localDataSource.insertAll(returnedCharacters.asCharacterDomainModel()!!)
-        }
+        updateCharactersFromRemoteDataSource()
+    }
+
+    private suspend fun updateCharactersFromRemoteDataSource() {
+        val remoteTasks = remoteDataSource.getCharacters()
+        localDataSource.saveCharacters(remoteTasks)
     }
 }
