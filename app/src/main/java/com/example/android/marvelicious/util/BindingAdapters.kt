@@ -10,7 +10,6 @@ import timber.log.Timber
 fun setImageUrl(imageView: ImageView, image: Models.Image) {
     if (image.path.startsWith("http")) {
         val url = generateThumbnailLink(image, MarvelImageTypes.LANDSCAPE_LARGE)
-        Timber.d("The url is $url")
         Glide.with(imageView.context)
             .load(url)
             .centerCrop()

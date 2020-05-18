@@ -10,13 +10,13 @@ import com.example.android.marvelicious.R
 import com.example.android.marvelicious.databinding.CharacterItemBinding
 import com.example.android.marvelicious.domain.Models
 
-class CharactersDataAdapter : ListAdapter<Models.Character, CharactersViewHolder>(POST_COMPARATOR) {
+class CharactersDataAdapter(val click: CharacterClick) : ListAdapter<Models.Character, CharactersViewHolder>(POST_COMPARATOR) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CharactersViewHolder {
         return CharactersViewHolder.from(parent)
     }
 
     override fun onBindViewHolder(holder: CharactersViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), click)
     }
 
     companion object {
@@ -50,8 +50,21 @@ class CharactersViewHolder(val binding: CharacterItemBinding) :
         }
     }
 
-    fun bind(item: Models.Character) {
+    fun bind(
+        item: Models.Character,
+        click: CharacterClick
+    ) {
         binding.character = item
         binding.executePendingBindings()
+        binding.characterClickCallback = click
     }
+}
+
+class CharacterClick(val click: (Models.Character) -> Unit) {
+    /**
+     * Called when a video is clicked
+     *
+     * @param video the video that was clicked
+     */
+    fun onClick(character: Models.Character) = click(character)
 }

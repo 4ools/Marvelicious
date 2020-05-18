@@ -9,6 +9,9 @@
             name="character"
             type="com.example.android.marvelicious.domain.Models.Character" />
 
+        <variable
+            name="characterClickCallback"
+            type="com.example.android.marvelicious.ui.CharacterClick" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -75,21 +78,22 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:adjustViewBounds="false"
+                android:contentDescription="@string/image_of_the_marvel_character"
                 android:cropToPadding="false"
                 android:scaleType="centerCrop"
+                app:imageUrl="@{character.thumbnail}"
                 app:layout_constraintDimensionRatio="h,4:3"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:imageUrl="@{character.thumbnail}"
-                tools:srcCompat="@tools:sample/backgrounds/scenic"
-                android:contentDescription="@string/image_of_the_marvel_character" />
+                tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
             <View
                 android:id="@+id/clickableOverlay"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:background="?attr/selectableItemBackground"
+                android:onClick="@{() -> characterClickCallback.onClick(character)}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"

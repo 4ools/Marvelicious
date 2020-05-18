@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -38,7 +39,9 @@ class CharactersFragment : Fragment() {
         )
         binding.lifecycleOwner = this
 
-        adapter = CharactersDataAdapter()
+        adapter = CharactersDataAdapter(CharacterClick {
+            Toast.makeText(activity, "character called ${it.name}", Toast.LENGTH_SHORT).show()
+        })
         binding.charactersList.adapter = adapter
         binding.charactersList.layoutManager = LinearLayoutManager(context)
 
