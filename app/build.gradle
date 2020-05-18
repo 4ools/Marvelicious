@@ -19,7 +19,13 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField 'String', "MarvelPublicApiKey", MARVEL_API_PUBLIC_KEY
+            buildConfigField 'String', "MarvelPrivateApiKey", MARVEL_API_PRIVATE_KEY
+        }
         release {
+            buildConfigField 'String', "MarvelPublicApiKey", MARVEL_API_PUBLIC_KEY
+            buildConfigField 'String', "MarvelPrivateApiKey", MARVEL_API_PRIVATE_KEY
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -60,6 +66,9 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.6.0'
     implementation 'com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2'
     implementation 'com.squareup.retrofit2:converter-moshi:2.5.0'
+
+    // okhttp logging interceptor
+    implementation("com.squareup.okhttp3:logging-interceptor:4.7.0")
 
     // moshi for parsing the JSON format
     def moshi_version = "1.6.0"
