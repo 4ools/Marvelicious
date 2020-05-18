@@ -2,6 +2,7 @@ package com.example.android.marvelicious.ui
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.example.android.marvelicious.database.getDatabase
 import com.example.android.marvelicious.domain.Models
 import com.example.android.marvelicious.repository.Repository
 import kotlinx.coroutines.CoroutineScope
@@ -15,7 +16,7 @@ class CharactersViewModel(application: Application) : AndroidViewModel(applicati
     private val viewModelJob = SupervisorJob()
     private val viewModelScope = CoroutineScope(viewModelJob + Dispatchers.Main)
 
-    private val repository = Repository()
+    private val repository = Repository(getDatabase(application))
 
     private var _characters = repository.characters
     val characters: LiveData<List<Models.Character>>

@@ -1,5 +1,7 @@
 package com.example.android.marvelicious.network
 
+import com.example.android.marvelicious.database.DatabaseCharacter
+import com.example.android.marvelicious.database.DatabaseImage
 import com.example.android.marvelicious.domain.Models
 import com.squareup.moshi.JsonClass
 
@@ -70,15 +72,21 @@ fun CharacterDataWrapper.asCharacterDomainModel(): List<Models.Character>? {
 fun Image.asImageDomainModel(): Models.Image {
     return Models.Image(path = this.path, extension = this.extension)
 }
+
+fun Image.asDatabaseModel(): DatabaseImage {
+    return DatabaseImage(path = this.path, extension = this.extension)
+}
+
 //
-//    fun NetworkVideoContainer.asDatabaseModel(): List<DatabaseVideo> {
-//        return videos.map {
-//            DatabaseVideo(
-//                url = it.url,
-//                updated = it.updated,
-//                title = it.title,
-//                description = it.description,
-//                thumbnail = it.thumbnail
-//            )
-//        }
-//    }
+fun CharacterDataWrapper.asDatabaseModel(): List<DatabaseCharacter>? {
+    return data?.results?.map {
+        DatabaseCharacter(
+            id = it.id!!,
+            name = it.name,
+            description = it.description,
+            modified = it.modified,
+            resourceURI = it.resourceURI,
+            thumbnail = it.thumbnail?.asDatabaseModel()
+        )
+    }
+}
