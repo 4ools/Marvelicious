@@ -1,4 +1,4 @@
-package com.example.android.marvelicious.database
+package com.example.android.marvelicious.data.source.database
 
 import androidx.room.Embedded
 import androidx.room.Entity

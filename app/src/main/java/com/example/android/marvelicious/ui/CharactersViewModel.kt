@@ -2,9 +2,10 @@ package com.example.android.marvelicious.ui
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.example.android.marvelicious.database.getDatabase
+import com.example.android.marvelicious.data.source.database.getDatabase
 import com.example.android.marvelicious.domain.Models
-import com.example.android.marvelicious.repository.Repository
+import com.example.android.marvelicious.data.source.Repository
+import com.example.android.marvelicious.data.source.database.LocalDataSource
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.IOException
@@ -13,7 +14,8 @@ class CharactersViewModel(application: Application) : AndroidViewModel(applicati
     private val viewModelJob = SupervisorJob()
     private val viewModelScope = CoroutineScope(viewModelJob + Dispatchers.Main)
 
-    private val repository = Repository(getDatabase(application))
+    private val repository =
+        Repository(LocalDataSource(getDatabase(application).charactersDao))
 
     private var _characters = repository.characters
     val characters: LiveData<List<Models.Character>>

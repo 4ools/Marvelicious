@@ -1,4 +1,4 @@
-package com.example.android.marvelicious.network
+package com.example.android.marvelicious.data.source.network
 
 import com.example.android.marvelicious.BuildConfig
 import com.example.android.marvelicious.util.Crypto

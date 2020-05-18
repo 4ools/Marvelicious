@@ -1,4 +1,4 @@
-package com.example.android.marvelicious.database
+package com.example.android.marvelicious.data.source.database
 
 import android.content.Context
 import androidx.lifecycle.LiveData
@@ -6,11 +6,11 @@ import androidx.room.*
 
 @Database(entities = [DatabaseCharacter::class], version = 1)
 abstract class MarveliciousDatabase : RoomDatabase() {
-    abstract val videoDao: VideoDao
+    abstract val charactersDao: CharactersDao
 }
 
 @Dao
-interface VideoDao {
+interface CharactersDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(characters: List<DatabaseCharacter>)
 

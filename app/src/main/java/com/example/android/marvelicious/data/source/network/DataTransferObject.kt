@@ -1,7 +1,7 @@
-package com.example.android.marvelicious.network
+package com.example.android.marvelicious.data.source.network
 
-import com.example.android.marvelicious.database.DatabaseCharacter
-import com.example.android.marvelicious.database.DatabaseImage
+import com.example.android.marvelicious.data.source.database.DatabaseCharacter
+import com.example.android.marvelicious.data.source.database.DatabaseImage
 import com.example.android.marvelicious.domain.Models
 import com.squareup.moshi.JsonClass
 
