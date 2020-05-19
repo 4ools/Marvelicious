@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.marvelicious.R
+import com.example.android.marvelicious.data.NetworkState
 import com.example.android.marvelicious.databinding.FragmentCharactersBinding
 import timber.log.Timber
 
@@ -65,7 +66,7 @@ class CharactersFragment : Fragment() {
 
         charactersViewModel.networkState.observe(viewLifecycleOwner, Observer {
             Timber.d("The state of the network is $it")
-            adapter.setResultState(it)
+            binding.swipeRefresh.isRefreshing = it == NetworkState.LOADING
             adapter.setResultState(it)
         })
 
