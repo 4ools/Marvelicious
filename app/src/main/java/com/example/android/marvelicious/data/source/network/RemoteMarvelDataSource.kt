@@ -13,16 +13,20 @@ class RemoteMarvelDataSource : MarvelDataSource {
         throw NotImplementedError()
     }
 
-    override suspend fun <T> getObjects(): List<T> {
+    override suspend fun <T> getObjects(offset: Int, limit: Int): List<T> {
         val returnedCharacters = marvelApi.getAllCharactersAsync(
-            limit = 50,
-            offset = 0
+            limit = limit ,
+            offset = offset
         ).await()
 
         return returnedCharacters.asCharacterDomainModel()!! as List<T>
     }
 
     override fun <T> getObjectDataSource(): DataSource.Factory<Int, T> {
+        throw NotImplementedError()
+    }
+
+    override fun getTotalObjectsCount(): Int {
         throw NotImplementedError()
     }
 }

@@ -1,7 +1,6 @@
 package com.example.android.marvelicious.data.source.database
 
 import android.content.Context
-import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.room.*
 
@@ -20,6 +19,9 @@ interface CharactersDao {
 
     @Query("SELECT * FROM character ORDER BY name ASC")
     fun getChars(): List<DatabaseCharacter>
+
+    @Query("SELECT COUNT(*) FROM character")
+    fun getTotalCharactersCount(): Int
 }
 
 private lateinit var INSTANCE: MarveliciousDatabase

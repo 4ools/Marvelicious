@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.PagedList
 import com.example.android.marvelicious.data.NetworkState
-import com.example.android.marvelicious.data.source.network.RemoteMarvelDataSource
+import com.example.android.marvelicious.data.source.MarvelDataSource
 import com.example.android.marvelicious.domain.Models
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,10 +12,10 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MarveliciousCharacterBoundaryCallback(
-    private val remoteDataSource: RemoteMarvelDataSource,
-    private val localDataSource: LocalMarvelDataSource
+    private val remoteDataSource: MarvelDataSource,
+    private val localDataSource: MarvelDataSource
 ) : PagedList.BoundaryCallback<Models.Character>() {
-    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+    private val viewModelScope = CoroutineScope(Dispatchers.IO)
     private var isRequestInProgress = false
 
 
@@ -23,17 +23,35 @@ class MarveliciousCharacterBoundaryCallback(
     val networkState: LiveData<NetworkState>
         get() = _networkState
 
-    override fun onZeroItemsLoaded() {
-        requestAndSaveData()
+    companion object {
+        const val NETWORK_PAGE_SIZE = 50
     }
 
-    private fun requestAndSaveData() {
+    override fun onZeroItemsLoaded() {
+        viewModelScope.launch {
+            val offset = localDataSource.getTotalObjectsCount()
+            requestAndSaveData(offset)
+        }
+    }
+
+    override fun onItemAtEndLoaded(itemAtEnd: Models.Character) {
+        viewModelScope.launch {
+            val offset = localDataSource.getTotalObjectsCount()
+            requestAndSaveData(offset)
+        }
+    }
+
+    private fun requestAndSaveData(offSet: Int, limit: Int = NETWORK_PAGE_SIZE) {
         if (isRequestInProgress) return
         viewModelScope.launch {
             isRequestInProgress = true
             try {
                 _networkState.postValue(NetworkState.LOADING)
-                localDataSource.saveObjects<Models.Character>(remoteDataSource.getObjects())
+                localDataSource.saveObjects<Models.Character>(
+                    remoteDataSource.getObjects(
+                        offSet, limit
+                    )
+                )
                 _networkState.postValue(NetworkState.LOADED)
             } catch (e: Exception) {
                 Timber.e("caught in repo $e")

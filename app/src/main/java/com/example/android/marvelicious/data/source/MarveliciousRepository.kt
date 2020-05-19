@@ -5,11 +5,12 @@ import com.example.android.marvelicious.data.Result
 import com.example.android.marvelicious.data.source.database.LocalMarvelDataSource
 import com.example.android.marvelicious.data.source.database.MarveliciousCharacterBoundaryCallback
 import com.example.android.marvelicious.data.source.network.RemoteMarvelDataSource
+import com.example.android.marvelicious.domain.Models
 
 
 class MarveliciousRepository(
-    private val remoteDataSource: RemoteMarvelDataSource,
-    private val localDataSource: LocalMarvelDataSource
+    private val remoteDataSource: MarvelDataSource,
+    private val localDataSource: MarvelDataSource
 ) : Repository {
     override suspend fun getCharacters(): Result {
         throw NotImplementedError()
@@ -21,7 +22,7 @@ class MarveliciousRepository(
 
     private fun updateCharactersFromRemoteDataSource():
             Result {
-        val dataSourceFactory = localDataSource.getDataForNow()
+        val dataSourceFactory = localDataSource.getObjectDataSource<Models.Character>()
 
         val boundaryCallback = MarveliciousCharacterBoundaryCallback(
             remoteDataSource,
