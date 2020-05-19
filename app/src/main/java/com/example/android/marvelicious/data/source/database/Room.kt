@@ -22,6 +22,9 @@ interface CharactersDao {
 
     @Query("SELECT COUNT(*) FROM character")
     fun getTotalCharactersCount(): Int
+
+    @Query("DELETE FROM character")
+    fun deleteAllCharacters()
 }
 
 private lateinit var INSTANCE: MarveliciousDatabase

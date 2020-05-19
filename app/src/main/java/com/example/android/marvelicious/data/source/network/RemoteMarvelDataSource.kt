@@ -2,7 +2,6 @@ package com.example.android.marvelicious.data.source.network
 
 import androidx.paging.DataSource
 import com.example.android.marvelicious.data.source.MarvelDataSource
-import com.example.android.marvelicious.domain.Models
 
 class RemoteMarvelDataSource : MarvelDataSource {
     private val marvelApi by lazy {
@@ -27,6 +26,10 @@ class RemoteMarvelDataSource : MarvelDataSource {
     }
 
     override fun getTotalObjectsCount(): Int {
+        throw NotImplementedError()
+    }
+
+    override fun deleteAllObjects() {
         throw NotImplementedError()
     }
 }

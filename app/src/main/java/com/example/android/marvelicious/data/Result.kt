@@ -6,7 +6,8 @@ import com.example.android.marvelicious.domain.Models
 
 data class Result(
     val data: LiveData<PagedList<Models.Character>>,
-    val networkState: LiveData<NetworkState>
+    val networkState: LiveData<NetworkState>,
+    val refresh: suspend () -> Result
 )
 
 enum class Status {
