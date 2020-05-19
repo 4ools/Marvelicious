@@ -29,7 +29,7 @@ class RemoteDataSource : DataSource {
     override suspend fun getCharacters(): Result<List<Models.Character>> {
         return try {
             val returnedCharacters = marvelApi.getAllCharactersAsync(
-                limit = 50,
+                limit = 20,
                 offset = 0
             ).await()
             Result.Success(returnedCharacters.asCharacterDomainModel()!!)

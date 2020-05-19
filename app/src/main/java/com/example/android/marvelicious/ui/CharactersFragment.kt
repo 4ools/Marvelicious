@@ -44,6 +44,8 @@ class CharactersFragment : Fragment() {
 
         adapter = CharactersDataAdapter(CharacterClick {
             Toast.makeText(activity, "character called ${it.name}", Toast.LENGTH_SHORT).show()
+        }, NetworkStateViewHolder.OnClick {
+            charactersViewModel.refresh()
         })
 
         binding.charactersList.adapter = adapter
@@ -60,10 +62,14 @@ class CharactersFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         charactersViewModel.characters.observe(viewLifecycleOwner, Observer {
             adapter.submitList(it)
+            adapter.setResultState(Result.Success(it))
         })
 
         charactersViewModel.dataLoading.observe(viewLifecycleOwner, Observer {
             Timber.d("The value is $it")
+            if (it) {
+                adapter.setResultState(Result.Loading)
+            }
         })
 
         charactersViewModel.result.observe(
@@ -73,13 +79,16 @@ class CharactersFragment : Fragment() {
                     is Result.Success -> {
                         binding.swipeRefresh.isRefreshing = false
                         Timber.d("result is success ${it.data}")
+                        adapter.setResultState(it)
                     }
                     is Result.Loading -> {
                         Timber.d("result is loading $it")
                         binding.swipeRefresh.isRefreshing = true
+                        adapter.setResultState(it)
                     }
                     is Result.Error -> {
                         Timber.d("result is error $it")
+                        adapter.setResultState(it)
                     }
                 }
             })
