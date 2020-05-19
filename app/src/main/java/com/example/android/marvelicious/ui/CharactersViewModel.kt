@@ -2,17 +2,17 @@ package com.example.android.marvelicious.ui
 
 import android.app.Application
 import androidx.lifecycle.*
+import androidx.paging.PagedList
+import com.example.android.marvelicious.data.NetworkState
 import com.example.android.marvelicious.data.Result
 import com.example.android.marvelicious.data.source.MarveliciousRepository
-import com.example.android.marvelicious.data.source.database.LocalDataSource
+import com.example.android.marvelicious.data.source.database.LocalMarvelDataSource
 import com.example.android.marvelicious.data.source.database.getDatabase
-import com.example.android.marvelicious.data.source.network.RemoteDataSource
+import com.example.android.marvelicious.data.source.network.RemoteMarvelDataSource
 import com.example.android.marvelicious.domain.Models
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class CharactersViewModel(application: Application) : AndroidViewModel(application) {
     private val viewModelJob = SupervisorJob()
@@ -20,58 +20,19 @@ class CharactersViewModel(application: Application) : AndroidViewModel(applicati
 
     private val repository =
         MarveliciousRepository(
-            RemoteDataSource(),
-            LocalDataSource(getDatabase(application).charactersDao)
+            RemoteMarvelDataSource(),
+            LocalMarvelDataSource(getDatabase(application).charactersDao)
         )
 
-    private val _forceUpdate = MutableLiveData(false)
-
-    private var _characters = Transformations.switchMap(_forceUpdate) {
-        if (it) {
-            _dataLoading.value = true
-            viewModelScope.launch {
-                val result = repository.refreshCharacters()
-                if (result is Result.Success<*>) {
-                } else {
-                    Timber.d("result caught in vm")
-                    _results.value = result.value
-                }
-                _dataLoading.value = false
-            }
-        }
-
-
-        Transformations.map(repository.observeCharacters()) { result ->
-            if (result is Result.Success) {
-                result.data
-            } else {
-                _results.value = repository.observeCharacters().value
-                emptyList()
-            }
-        }
+    private val _loadRepos = MutableLiveData(false)
+    private val repoResult: LiveData<Result> = Transformations.map(_loadRepos) {
+        repository.refreshCharacters()
     }
 
-    private val _results = MutableLiveData<Result<List<Models.Character>>>()
-    val result: LiveData<Result<List<Models.Character>>>
-        get() = _results
-
-
-    val characters: LiveData<List<Models.Character>>
-        get() = _characters
-
-    private val _dataLoading = MutableLiveData<Boolean>()
-    val dataLoading: LiveData<Boolean> = _dataLoading
-
-    init {
-        loadCharacters(true)
-    }
-
-    fun loadCharacters(forceUpdate: Boolean) {
-        _forceUpdate.value = forceUpdate
-    }
-
-    fun refresh() {
-        _forceUpdate.value = true
+    val repos: LiveData<PagedList<Models.Character>> =
+        Transformations.switchMap(repoResult) { it -> it.data }
+    val networkState: LiveData<NetworkState> = Transformations.switchMap(repoResult) { it ->
+        it.networkState
     }
 
     /**
@@ -80,6 +41,10 @@ class CharactersViewModel(application: Application) : AndroidViewModel(applicati
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
+    }
+
+    init {
+        _loadRepos.postValue(true)
     }
 
     /**

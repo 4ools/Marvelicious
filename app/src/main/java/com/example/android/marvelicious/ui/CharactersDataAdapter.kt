@@ -3,21 +3,77 @@ package com.example.android.marvelicious.ui
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.marvelicious.R
+import com.example.android.marvelicious.data.NetworkState
+import com.example.android.marvelicious.data.Result
 import com.example.android.marvelicious.databinding.CharacterItemBinding
 import com.example.android.marvelicious.domain.Models
 
-class CharactersDataAdapter(val click: CharacterClick) : ListAdapter<Models.Character, CharactersViewHolder>(POST_COMPARATOR) {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CharactersViewHolder {
-        return CharactersViewHolder.from(parent)
+class CharactersDataAdapter(
+    private val click: CharacterClick,
+    private val retry: NetworkStateViewHolder.OnClick
+) :
+    PagedListAdapter<Models.Character, RecyclerView.ViewHolder>(POST_COMPARATOR) {
+
+
+    private var networkState: NetworkState? = null
+
+    fun setResultState(resultState: NetworkState?) {
+        val previousState = this.networkState
+        val hadExtraRow = hasExtraRow()
+        this.networkState = resultState
+        val hasExtraRow = hasExtraRow()
+        if (hadExtraRow != hasExtraRow) {
+            if (hadExtraRow) {
+                notifyItemRemoved(super.getItemCount())
+            } else {
+                notifyItemInserted(super.getItemCount())
+            }
+        } else if (hasExtraRow && previousState != resultState) {
+            notifyItemChanged(itemCount - 1)
+        }
     }
 
-    override fun onBindViewHolder(holder: CharactersViewHolder, position: Int) {
-        holder.bind(getItem(position), click)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            R.layout.character_item -> CharactersViewHolder.from(parent)
+            R.layout.network_state_item -> NetworkStateViewHolder.from(parent)
+            else -> throw IllegalArgumentException("unknown view type $viewType")
+        }
     }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (getItemViewType(position)) {
+            R.layout.character_item -> (holder as CharactersViewHolder).bind(
+                getItem(position)!!,
+                click
+            )
+            R.layout.network_state_item -> (holder as NetworkStateViewHolder).bind(
+                networkState,
+                retry
+            )
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return if (hasExtraRow() && position == itemCount - 1) {
+            R.layout.network_state_item
+        } else {
+            R.layout.character_item
+        }
+    }
+
+    override fun getItemCount(): Int {
+        return super.getItemCount() + if (hasExtraRow()) 1 else 0
+    }
+
+
+    private fun hasExtraRow() =
+        networkState != null && networkState != NetworkState.LOADED
 
     companion object {
         val POST_COMPARATOR = object : DiffUtil.ItemCallback<Models.Character>() {

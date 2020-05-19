@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Marvelicious</string>
     <string name="image_of_the_marvel_character">Image of the Marvel Character</string>
+    <string name="retry">Retry</string>
 </resources>

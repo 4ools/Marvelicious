@@ -44,13 +44,15 @@ class CharactersFragment : Fragment() {
 
         adapter = CharactersDataAdapter(CharacterClick {
             Toast.makeText(activity, "character called ${it.name}", Toast.LENGTH_SHORT).show()
+        }, NetworkStateViewHolder.OnClick {
+//            charactersViewModel.refresh()
         })
 
         binding.charactersList.adapter = adapter
         binding.charactersList.layoutManager = LinearLayoutManager(context)
 
         binding.swipeRefresh.setOnRefreshListener {
-            charactersViewModel.refresh()
+//            charactersViewModel.refresh()
         }
 
         return binding.root
@@ -58,30 +60,14 @@ class CharactersFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        charactersViewModel.characters.observe(viewLifecycleOwner, Observer {
+        charactersViewModel.repos.observe(viewLifecycleOwner, Observer {
             adapter.submitList(it)
         })
 
-        charactersViewModel.dataLoading.observe(viewLifecycleOwner, Observer {
-            Timber.d("The value is $it")
+        charactersViewModel.networkState.observe(viewLifecycleOwner, Observer {
+            Timber.d("The state of the network is $it")
+            adapter.setResultState(it)
         })
 
-        charactersViewModel.result.observe(
-            viewLifecycleOwner,
-            Observer {
-                when (it) {
-                    is Result.Success -> {
-                        binding.swipeRefresh.isRefreshing = false
-                        Timber.d("result is success ${it.data}")
-                    }
-                    is Result.Loading -> {
-                        Timber.d("result is loading $it")
-                        binding.swipeRefresh.isRefreshing = true
-                    }
-                    is Result.Error -> {
-                        Timber.d("result is error $it")
-                    }
-                }
-            })
     }
 }

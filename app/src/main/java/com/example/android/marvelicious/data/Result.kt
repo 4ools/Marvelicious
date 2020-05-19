@@ -1,26 +1,25 @@
 package com.example.android.marvelicious.data
 
-import java.lang.Exception
+import androidx.lifecycle.LiveData
+import androidx.paging.PagedList
+import com.example.android.marvelicious.domain.Models
 
-sealed class Result<out R> {
-    data class Success<out T>(val data: T) : Result<T>()
-    data class Error(val exception: Exception) : Result<Nothing>()
-    object Loading : Result<Nothing>()
+data class Result(
+    val data: LiveData<PagedList<Models.Character>>,
+    val networkState: LiveData<NetworkState>
+)
 
-    override fun toString(): String {
-        return when (this) {
-            is Success<*> -> {
-                "Success[data=$data]"
-            }
-            is Error -> {
-                "Error[exception=$exception]"
-            }
-            is Loading -> {
-                "Loading"
-            }
-        }
-    }
+enum class Status {
+    RUNNING,
+    SUCCESS,
+    FAILED
 }
 
-val Result<*>.succeeded
-    get() = this is Result.Success && data != null
+@Suppress("DataClassPrivateConstructor")
+data class NetworkState private constructor(val status: Status, val message: String? = null) {
+    companion object {
+        val LOADED = NetworkState(Status.SUCCESS)
+        val LOADING = NetworkState(Status.RUNNING)
+        fun error(message: String?) = NetworkState(Status.FAILED, message)
+    }
+}
