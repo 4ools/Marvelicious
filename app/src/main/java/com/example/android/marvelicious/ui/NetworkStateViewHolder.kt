@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.android.marvelicious.R
 import com.example.android.marvelicious.databinding.NetworkStateItemBinding
 
-class NetworkStateViewHolder(val binding: NetworkStateItemBinding) :
+class NetworkStateViewHolder(private val binding: NetworkStateItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
     companion object {
         fun from(parent: ViewGroup): NetworkStateViewHolder {

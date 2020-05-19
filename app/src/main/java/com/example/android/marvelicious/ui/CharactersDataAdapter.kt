@@ -10,11 +10,10 @@ import com.example.android.marvelicious.R
 import com.example.android.marvelicious.data.Result
 import com.example.android.marvelicious.databinding.CharacterItemBinding
 import com.example.android.marvelicious.domain.Models
-import timber.log.Timber
 
 class CharactersDataAdapter(
-    val click: CharacterClick,
-    val retry: NetworkStateViewHolder.OnClick
+    private val click: CharacterClick,
+    private val retry: NetworkStateViewHolder.OnClick
 ) :
     ListAdapter<Models.Character, RecyclerView.ViewHolder>(POST_COMPARATOR) {
 
@@ -72,7 +71,7 @@ class CharactersDataAdapter(
 
 
     private fun hasExtraRow() =
-        result != null && result !is Result.Loading && result !is Result.Success
+        result !is Result.Loading && result !is Result.Success
 
     companion object {
         val POST_COMPARATOR = object : DiffUtil.ItemCallback<Models.Character>() {

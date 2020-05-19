@@ -66,7 +66,6 @@ class CharactersFragment : Fragment() {
         })
 
         charactersViewModel.dataLoading.observe(viewLifecycleOwner, Observer {
-            Timber.d("The value is $it")
             if (it) {
                 adapter.setResultState(Result.Loading)
             }
