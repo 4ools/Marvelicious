@@ -16,8 +16,6 @@ class MarveliciousCharacterBoundaryCallback(
     private val localDataSource: MarvelDataSource
 ) : PagedList.BoundaryCallback<Models.Character>() {
     private val viewModelScope = CoroutineScope(Dispatchers.IO)
-    private var isRequestInProgress = false
-
 
     private val _networkState = MutableLiveData<NetworkState>()
     val networkState: LiveData<NetworkState>
@@ -28,6 +26,7 @@ class MarveliciousCharacterBoundaryCallback(
     }
 
     override fun onZeroItemsLoaded() {
+        Timber.d("onZeroItemsLoaded")
         viewModelScope.launch {
             val offset = localDataSource.getTotalObjectsCount()
             requestAndSaveData(offset)
@@ -35,6 +34,7 @@ class MarveliciousCharacterBoundaryCallback(
     }
 
     override fun onItemAtEndLoaded(itemAtEnd: Models.Character) {
+        Timber.d("onItemAtEndLoaded with ${itemAtEnd.name}")
         viewModelScope.launch {
             val offset = localDataSource.getTotalObjectsCount()
             requestAndSaveData(offset)
@@ -42,9 +42,8 @@ class MarveliciousCharacterBoundaryCallback(
     }
 
     private fun requestAndSaveData(offSet: Int, limit: Int = NETWORK_PAGE_SIZE) {
-        if (isRequestInProgress) return
+        Timber.d("requestAndSaveData with $offSet and $limit")
         viewModelScope.launch {
-            isRequestInProgress = true
             try {
                 _networkState.postValue(NetworkState.LOADING)
                 localDataSource.saveObjects<Models.Character>(

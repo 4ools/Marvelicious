@@ -12,6 +12,9 @@ class MarveliciousRepository(
     private val remoteDataSource: MarvelDataSource,
     private val localDataSource: MarvelDataSource
 ) : Repository {
+    companion object {
+        const val PAGE_SIZE = 20
+    }
     override suspend fun getCharacters(): Result {
         throw NotImplementedError()
     }
@@ -29,7 +32,7 @@ class MarveliciousRepository(
             localDataSource
         )
 
-        val data = LivePagedListBuilder(dataSourceFactory, 20)
+        val data = LivePagedListBuilder(dataSourceFactory, PAGE_SIZE)
             .setBoundaryCallback(boundaryCallback)
             .build()
 
