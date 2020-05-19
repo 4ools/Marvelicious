@@ -19,10 +19,18 @@ class LocalMarvelDataSource(
         }
     }
 
-    override suspend fun saveCharacters(characters: List<Models.Character>) =
-        withContext(ioDispatcher) {
-            charactersDao.insertAll(characters.asDatabaseModel()!!)
-        }
+    override suspend fun <T> saveObjects(characters: List<T>) = withContext(ioDispatcher) {
+        val charactersToStore = characters as List<Models.Character>
+        charactersDao.insertAll(characters.asDatabaseModel()!!)
+    }
 
-    override suspend fun getCharacters(): List<Models.Character> = throw NotImplementedError()
+    override suspend fun <T> getObjects(): List<T> {
+        throw NotImplementedError()
+    }
+
+    override fun <T> getObjectDataSource(): DataSource.Factory<Int, T> {
+        return charactersDao.getAllCharacters().map {
+            it.asDomainModel() as T
+        }
+    }
 }

@@ -33,7 +33,7 @@ class MarveliciousCharacterBoundaryCallback(
             isRequestInProgress = true
             try {
                 _networkState.postValue(NetworkState.LOADING)
-                localDataSource.saveCharacters(remoteDataSource.getCharacters())
+                localDataSource.saveObjects<Models.Character>(remoteDataSource.getObjects())
                 _networkState.postValue(NetworkState.LOADED)
             } catch (e: Exception) {
                 Timber.e("caught in repo $e")
