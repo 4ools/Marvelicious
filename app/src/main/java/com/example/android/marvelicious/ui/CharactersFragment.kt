@@ -11,7 +11,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.marvelicious.R
+import com.example.android.marvelicious.data.Result
 import com.example.android.marvelicious.databinding.FragmentCharactersBinding
+import timber.log.Timber
 
 class CharactersFragment : Fragment() {
 
@@ -55,17 +57,24 @@ class CharactersFragment : Fragment() {
             adapter.submitList(it)
         })
 
-        charactersViewModel.eventNetworkError.observe(viewLifecycleOwner, Observer {
-            if (it) {
-                onNetworkError()
-            }
+        charactersViewModel.dataLoading.observe(viewLifecycleOwner, Observer {
+            Timber.d("The value is $it")
         })
-    }
 
-    private fun onNetworkError() {
-        if (!charactersViewModel.isNetworkErrorShown.value!!) {
-            Toast.makeText(activity, "Network Error", Toast.LENGTH_LONG).show()
-            charactersViewModel.onNetworkErrorShown()
-        }
+        charactersViewModel.result.observe(
+            viewLifecycleOwner,
+            Observer {
+                when (it) {
+                    is Result.Success -> {
+                        Timber.d("result is success ${it.data}")
+                    }
+                    is Result.Loading -> {
+                        Timber.d("result is loading $it")
+                    }
+                    is Result.Error -> {
+                        Timber.d("result is error $it")
+                    }
+                }
+            })
     }
 }

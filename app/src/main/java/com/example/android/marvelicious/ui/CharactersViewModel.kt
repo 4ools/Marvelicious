@@ -2,14 +2,17 @@ package com.example.android.marvelicious.ui
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.example.android.marvelicious.data.source.database.getDatabase
-import com.example.android.marvelicious.domain.Models
+import com.example.android.marvelicious.data.Result
 import com.example.android.marvelicious.data.source.MarveliciousRepository
 import com.example.android.marvelicious.data.source.database.LocalDataSource
+import com.example.android.marvelicious.data.source.database.getDatabase
 import com.example.android.marvelicious.data.source.network.RemoteDataSource
-import kotlinx.coroutines.*
+import com.example.android.marvelicious.domain.Models
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.IOException
 
 class CharactersViewModel(application: Application) : AndroidViewModel(application) {
     private val viewModelJob = SupervisorJob()
@@ -21,41 +24,52 @@ class CharactersViewModel(application: Application) : AndroidViewModel(applicati
             LocalDataSource(getDatabase(application).charactersDao)
         )
 
-    private var _characters = repository.observeCharacters()
-    val characters: LiveData<List<Models.Character>>
-        get() = _characters
+    private val _forceUpdate = MutableLiveData(false)
 
-    private var _eventNetworkError = MutableLiveData(false)
-    val eventNetworkError: LiveData<Boolean>
-        get() = _eventNetworkError
-
-    private var _isNetworkErrorShown = MutableLiveData(false)
-
-    val isNetworkErrorShown: LiveData<Boolean>
-        get() = _isNetworkErrorShown
-
-    init {
-        refreshDataFromRepository()
-    }
-
-    private fun refreshDataFromRepository() {
-        viewModelScope.launch {
-            try {
-                repository.getCharacters()
-                _eventNetworkError.value = false
-                _isNetworkErrorShown.value = false
-            } catch (networkError: IOException) {
-                Timber.e(networkError)
-                if (characters.value.isNullOrEmpty()) {
-                    _eventNetworkError.value = true
+    private var _characters = Transformations.switchMap(_forceUpdate) {
+        if (it) {
+            _dataLoading.value = true
+            viewModelScope.launch {
+                val result = repository.refreshCharacters()
+                if (result is Result.Success<*>) {
+                } else {
+                    Timber.d("result caught in vm")
+                    _results.value = result.value
                 }
+                _dataLoading.value = false
+            }
+        }
+        Transformations.map(repository.observeCharacters()) { result ->
+            if (result is Result.Success) {
+                result.data
+            } else {
+                _results.value = repository.observeCharacters().value
+                emptyList()
             }
         }
     }
 
+    private val _results = MutableLiveData<Result<List<Models.Character>>>()
+    val result: LiveData<Result<List<Models.Character>>>
+        get() = _results
 
-    fun onNetworkErrorShown() {
-        _isNetworkErrorShown.value = true
+
+    val characters: LiveData<List<Models.Character>>
+        get() = _characters
+
+    private val _dataLoading = MutableLiveData<Boolean>()
+    val dataLoading: LiveData<Boolean> = _dataLoading
+
+    init {
+        loadCharacters(true)
+    }
+
+    fun loadCharacters(forceUpdate: Boolean) {
+        _forceUpdate.value = forceUpdate
+    }
+
+    fun refresh() {
+        _forceUpdate.value = true
     }
 
     /**
