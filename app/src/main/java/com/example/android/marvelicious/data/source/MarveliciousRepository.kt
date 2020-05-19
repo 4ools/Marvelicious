@@ -13,6 +13,7 @@ class MarveliciousRepository(
     private val remoteDataSource: RemoteDataSource,
     private val localDataSource: LocalDataSource
 ) : Repository {
+
     override suspend fun getCharacters(): Result<List<Models.Character>> {
         return try {
             updateCharactersFromRemoteDataSource()

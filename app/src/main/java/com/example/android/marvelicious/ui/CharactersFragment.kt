@@ -26,13 +26,14 @@ class CharactersFragment : Fragment() {
     }
 
     private lateinit var adapter: CharactersDataAdapter
+    private lateinit var binding: FragmentCharactersBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding: FragmentCharactersBinding = DataBindingUtil.inflate(
+        binding = DataBindingUtil.inflate(
             inflater,
             R.layout.fragment_characters,
             container,
@@ -47,6 +48,10 @@ class CharactersFragment : Fragment() {
 
         binding.charactersList.adapter = adapter
         binding.charactersList.layoutManager = LinearLayoutManager(context)
+
+        binding.swipeRefresh.setOnRefreshListener {
+            charactersViewModel.refresh()
+        }
 
         return binding.root
     }
@@ -66,10 +71,12 @@ class CharactersFragment : Fragment() {
             Observer {
                 when (it) {
                     is Result.Success -> {
+                        binding.swipeRefresh.isRefreshing = false
                         Timber.d("result is success ${it.data}")
                     }
                     is Result.Loading -> {
                         Timber.d("result is loading $it")
+                        binding.swipeRefresh.isRefreshing = true
                     }
                     is Result.Error -> {
                         Timber.d("result is error $it")

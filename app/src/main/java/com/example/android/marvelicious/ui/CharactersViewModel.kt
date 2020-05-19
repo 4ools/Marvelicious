@@ -39,6 +39,8 @@ class CharactersViewModel(application: Application) : AndroidViewModel(applicati
                 _dataLoading.value = false
             }
         }
+
+
         Transformations.map(repository.observeCharacters()) { result ->
             if (result is Result.Success) {
                 result.data
