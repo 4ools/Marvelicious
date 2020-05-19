@@ -101,6 +101,10 @@ dependencies {
     def work_version = "1.0.1"
     implementation "android.arch.work:work-runtime-ktx:$work_version"
 
+    // Paging
+    def paging_version = "2.1.2"
+    implementation "androidx.paging:paging-runtime-ktx:$paging_version"
+
     // Junit
     testImplementation 'junit:junit:4.12'
 

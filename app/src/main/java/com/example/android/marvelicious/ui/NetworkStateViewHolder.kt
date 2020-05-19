@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.marvelicious.R
+import com.example.android.marvelicious.data.NetworkState
+import com.example.android.marvelicious.data.Status
 import com.example.android.marvelicious.databinding.NetworkStateItemBinding
 
 class NetworkStateViewHolder(private val binding: NetworkStateItemBinding) :
@@ -21,30 +23,27 @@ class NetworkStateViewHolder(private val binding: NetworkStateItemBinding) :
             )
             return NetworkStateViewHolder(dataBinding)
         }
+
+        fun toVisibility(constrain: Boolean): Int {
+            return if (constrain) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+        }
     }
 
     fun bind(
-        result: Result<Any?>,
+        networkState: NetworkState?,
         retry: OnClick
     ) {
-        binding.errorMsg.visibility = View.GONE
-        binding.progressBar.visibility = View.GONE
-
-        when (result) {
-            is Result.Success -> {
-                binding.progressBar.visibility = View.VISIBLE
-            }
-
-            is Result.Error -> {
-                binding.retryButton.visibility = View.VISIBLE
-                binding.errorMsg.text = result.exception.toString()
-                binding.errorMsg.visibility = View.VISIBLE
-            }
-
-            is Result.Loading -> {
-
-            }
-        }
+        binding.progressBar.visibility =
+            toVisibility(networkState?.status == Status.RUNNING)
+        binding.retryButton.visibility =
+            toVisibility(networkState?.status == Status.FAILED)
+        binding.errorMsg.visibility =
+            toVisibility(networkState?.message != null)
+        binding.errorMsg.text = networkState?.message
         binding.retryButton.setOnClickListener { retry.onClick() }
     }
 

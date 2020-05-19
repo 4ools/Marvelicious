@@ -3,10 +3,12 @@ package com.example.android.marvelicious.ui
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.marvelicious.R
+import com.example.android.marvelicious.data.NetworkState
 import com.example.android.marvelicious.data.Result
 import com.example.android.marvelicious.databinding.CharacterItemBinding
 import com.example.android.marvelicious.domain.Models
@@ -15,15 +17,15 @@ class CharactersDataAdapter(
     private val click: CharacterClick,
     private val retry: NetworkStateViewHolder.OnClick
 ) :
-    ListAdapter<Models.Character, RecyclerView.ViewHolder>(POST_COMPARATOR) {
+    PagedListAdapter<Models.Character, RecyclerView.ViewHolder>(POST_COMPARATOR) {
 
 
-    private var result: Result<List<Models.Character>>? = null
+    private var networkState: NetworkState? = null
 
-    fun setResultState(resultState: Result<List<Models.Character>>?) {
-        val previousState = this.result
+    fun setResultState(resultState: NetworkState?) {
+        val previousState = this.networkState
         val hadExtraRow = hasExtraRow()
-        this.result = resultState
+        this.networkState = resultState
         val hasExtraRow = hasExtraRow()
         if (hadExtraRow != hasExtraRow) {
             if (hadExtraRow) {
@@ -47,11 +49,11 @@ class CharactersDataAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (getItemViewType(position)) {
             R.layout.character_item -> (holder as CharactersViewHolder).bind(
-                getItem(position),
+                getItem(position)!!,
                 click
             )
             R.layout.network_state_item -> (holder as NetworkStateViewHolder).bind(
-                Result.Success(null),
+                networkState,
                 retry
             )
         }
@@ -71,7 +73,7 @@ class CharactersDataAdapter(
 
 
     private fun hasExtraRow() =
-        result !is Result.Loading && result !is Result.Success
+        networkState != null && networkState != NetworkState.LOADED
 
     companion object {
         val POST_COMPARATOR = object : DiffUtil.ItemCallback<Models.Character>() {

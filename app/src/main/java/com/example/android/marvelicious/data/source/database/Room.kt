@@ -2,6 +2,7 @@ package com.example.android.marvelicious.data.source.database
 
 import android.content.Context
 import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import androidx.room.*
 
 @Database(entities = [DatabaseCharacter::class], version = 1)
@@ -15,7 +16,7 @@ interface CharactersDao {
     fun insertAll(characters: List<DatabaseCharacter>)
 
     @Query("SELECT * FROM character ORDER BY name ASC")
-    fun getAllCharacters(): LiveData<List<DatabaseCharacter>>
+    fun getAllCharacters(): DataSource.Factory<Int, DatabaseCharacter>
 
     @Query("SELECT * FROM character ORDER BY name ASC")
     fun getChars(): List<DatabaseCharacter>

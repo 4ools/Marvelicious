@@ -44,3 +44,17 @@ fun List<DatabaseCharacter>.asDomainModel(): List<Models.Character> {
         )
     }
 }
+
+fun DatabaseCharacter.asDomainModel() = Models.Character(
+    id = this.id,
+    name = this.name,
+    description = this.description,
+    modified = this.modified,
+    resourceURI = this.resourceURI,
+    urls = null,
+    thumbnail = this.thumbnail?.asDomainModel(),
+    comics = null,
+    stories = null,
+    events = null,
+    series = null
+)

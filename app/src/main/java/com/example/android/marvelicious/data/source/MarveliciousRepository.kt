@@ -1,50 +1,39 @@
 package com.example.android.marvelicious.data.source
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.paging.LivePagedListBuilder
 import com.example.android.marvelicious.data.Result
-import com.example.android.marvelicious.data.source.database.LocalDataSource
-import com.example.android.marvelicious.data.source.network.RemoteDataSource
-import com.example.android.marvelicious.domain.Models
-import timber.log.Timber
+import com.example.android.marvelicious.data.source.database.LocalMarvelDataSource
+import com.example.android.marvelicious.data.source.database.MarveliciousCharacterBoundaryCallback
+import com.example.android.marvelicious.data.source.network.RemoteMarvelDataSource
 
 
 class MarveliciousRepository(
-    private val remoteDataSource: RemoteDataSource,
-    private val localDataSource: LocalDataSource
+    private val remoteDataSource: RemoteMarvelDataSource,
+    private val localDataSource: LocalMarvelDataSource
 ) : Repository {
-
-    override suspend fun getCharacters(): Result<List<Models.Character>> {
-        return try {
-            updateCharactersFromRemoteDataSource()
-            localDataSource.getCharacters()
-        } catch (ex: Exception) {
-            Timber.e(ex)
-            Result.Error(ex)
-        }
+    override suspend fun getCharacters(): Result {
+        throw NotImplementedError()
     }
 
-    override fun observeCharacters(): LiveData<Result<List<Models.Character>>> {
-        return localDataSource.observeCharacters()
-    }
-
-    override suspend fun refreshCharacters(): LiveData<Result<List<Models.Character>>> {
+    override fun refreshCharacters(): Result {
         return updateCharactersFromRemoteDataSource()
     }
 
-    private suspend fun updateCharactersFromRemoteDataSource():
-            LiveData<Result<List<Models.Character>>> {
+    private fun updateCharactersFromRemoteDataSource():
+            Result {
+        val dataSourceFactory = localDataSource.getDataForNow()
 
-        val networkState = MutableLiveData<Result<List<Models.Character>>>()
-        val remoteTasks = remoteDataSource.getCharacters()
+        val boundaryCallback = MarveliciousCharacterBoundaryCallback(
+            remoteDataSource,
+            localDataSource
+        )
 
-        if (remoteTasks is Result.Success) {
-            localDataSource.saveCharacters(remoteTasks.data)
-            networkState.value = localDataSource.getCharacters()
-        } else if (remoteTasks is Result.Error) {
-            Timber.e("caught in repo ${remoteTasks.exception}")
-            networkState.value = Result.Error(remoteTasks.exception)
-        }
-        return networkState
+        val data = LivePagedListBuilder(dataSourceFactory, 20)
+            .setBoundaryCallback(boundaryCallback)
+            .build()
+
+        val networkState = boundaryCallback.networkState
+
+        return Result(data, networkState)
     }
 }
