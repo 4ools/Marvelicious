@@ -11,7 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.marvelicious.R
-import com.example.android.marvelicious.data.Result
+import com.example.android.marvelicious.data.NetworkState
 import com.example.android.marvelicious.databinding.FragmentCharactersBinding
 import timber.log.Timber
 
@@ -52,7 +52,7 @@ class CharactersFragment : Fragment() {
         binding.charactersList.layoutManager = LinearLayoutManager(context)
 
         binding.swipeRefresh.setOnRefreshListener {
-//            charactersViewModel.refresh()
+            charactersViewModel.refresh()
         }
 
         return binding.root
@@ -60,12 +60,13 @@ class CharactersFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        charactersViewModel.repos.observe(viewLifecycleOwner, Observer {
+        charactersViewModel.characters.observe(viewLifecycleOwner, Observer {
             adapter.submitList(it)
         })
 
         charactersViewModel.networkState.observe(viewLifecycleOwner, Observer {
             Timber.d("The state of the network is $it")
+            binding.swipeRefresh.isRefreshing = it == NetworkState.LOADING
             adapter.setResultState(it)
         })
 

@@ -2,7 +2,6 @@ package com.example.android.marvelicious.ui
 
 import android.view.LayoutInflater
 import android.view.View
-import com.example.android.marvelicious.data.Result
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView

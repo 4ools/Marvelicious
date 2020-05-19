@@ -4,9 +4,7 @@ import androidx.paging.DataSource
 import com.example.android.marvelicious.data.source.MarvelDataSource
 import com.example.android.marvelicious.domain.Models
 import com.example.android.marvelicious.domain.asDatabaseModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 class LocalMarvelDataSource(
     private val charactersDao: CharactersDao,
@@ -36,5 +34,12 @@ class LocalMarvelDataSource(
 
     override fun getTotalObjectsCount(): Int {
         return charactersDao.getTotalCharactersCount()
+    }
+
+    override fun deleteAllObjects() {
+        val scope = CoroutineScope(Dispatchers.IO)
+        scope.launch {
+            charactersDao.deleteAllCharacters()
+        }
     }
 }
