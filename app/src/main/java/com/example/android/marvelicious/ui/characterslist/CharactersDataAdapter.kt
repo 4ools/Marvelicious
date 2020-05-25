@@ -1,4 +1,4 @@
-package com.example.android.marvelicious.ui
+package com.example.android.marvelicious.ui.characterslist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -38,8 +38,12 @@ class CharactersDataAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            R.layout.character_item -> CharactersViewHolder.from(parent)
-            R.layout.network_state_item -> NetworkStateViewHolder.from(parent)
+            R.layout.character_item -> CharactersViewHolder.from(
+                parent
+            )
+            R.layout.network_state_item -> NetworkStateViewHolder.from(
+                parent
+            )
             else -> throw IllegalArgumentException("unknown view type $viewType")
         }
     }
@@ -100,7 +104,9 @@ class CharactersViewHolder(val binding: CharacterItemBinding) :
                 parent,
                 false
             )
-            return CharactersViewHolder(dataBinding)
+            return CharactersViewHolder(
+                dataBinding
+            )
         }
     }
 

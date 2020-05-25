@@ -1,4 +1,4 @@
-package com.example.android.marvelicious.ui
+package com.example.android.marvelicious.ui.characterslist
 
 import android.view.LayoutInflater
 import android.view.View
@@ -20,7 +20,9 @@ class NetworkStateViewHolder(private val binding: NetworkStateItemBinding) :
                 parent,
                 false
             )
-            return NetworkStateViewHolder(dataBinding)
+            return NetworkStateViewHolder(
+                dataBinding
+            )
         }
 
         fun toVisibility(constrain: Boolean): Int {
@@ -37,11 +39,17 @@ class NetworkStateViewHolder(private val binding: NetworkStateItemBinding) :
         retry: OnClick
     ) {
         binding.progressBar.visibility =
-            toVisibility(networkState?.status == Status.RUNNING)
+            toVisibility(
+                networkState?.status == Status.RUNNING
+            )
         binding.retryButton.visibility =
-            toVisibility(networkState?.status == Status.FAILED)
+            toVisibility(
+                networkState?.status == Status.FAILED
+            )
         binding.errorMsg.visibility =
-            toVisibility(networkState?.message != null)
+            toVisibility(
+                networkState?.message != null
+            )
         binding.errorMsg.text = networkState?.message
         binding.retryButton.setOnClickListener { retry.onClick() }
     }

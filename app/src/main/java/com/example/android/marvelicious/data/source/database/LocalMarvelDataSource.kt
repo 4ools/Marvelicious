@@ -1,5 +1,7 @@
 package com.example.android.marvelicious.data.source.database
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import androidx.paging.DataSource
 import com.example.android.marvelicious.data.source.MarvelDataSource
 import com.example.android.marvelicious.domain.Models
@@ -11,12 +13,6 @@ class LocalMarvelDataSource(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : MarvelDataSource {
 
-    fun getDataForNow(): DataSource.Factory<Int, Models.Character> {
-        return charactersDao.getAllCharacters().map {
-            it.asDomainModel()
-        }
-    }
-
     override suspend fun <T> saveObjects(characters: List<T>) = withContext(ioDispatcher) {
         characters as List<Models.Character>
         charactersDao.insertAll(characters.asDatabaseModel()!!)
@@ -26,7 +22,7 @@ class LocalMarvelDataSource(
         throw NotImplementedError()
     }
 
-    override fun <T> getObjectDataSource(): DataSource.Factory<Int, T> {
+    override fun <T> getObjectsDataSource(): DataSource.Factory<Int, T> {
         return charactersDao.getAllCharacters().map {
             it.asDomainModel() as T
         }
@@ -37,9 +33,27 @@ class LocalMarvelDataSource(
     }
 
     override fun deleteAllObjects() {
-        val scope = CoroutineScope(Dispatchers.IO)
-        scope.launch {
+        CoroutineScope(ioDispatcher).launch {
             charactersDao.deleteAllCharacters()
+        }
+    }
+
+    override suspend fun <T> saveObject(character: T) {
+        CoroutineScope(ioDispatcher).launch {
+            character as Models.Character
+            charactersDao.insert(character.asDatabaseModel())
+        }
+    }
+
+    override suspend fun <T> getObject(id: Int): T {
+        throw NotImplementedError()
+    }
+
+    override fun <T> getObjectDataSource(id: Int): LiveData<T> {
+        val fromDb = charactersDao.getMarvelCharacter(id)
+
+        return Transformations.map(fromDb) {
+            it.asDomainModel() as T
         }
     }
 }
