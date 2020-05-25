@@ -32,7 +32,7 @@ interface MarveliciousService {
     ): Deferred<CharacterDataWrapper>
 
     companion object {
-        private const val BASE_URL = "https://gateway.marvel.com/"
+        private const val BASE_URL = "https://gateway.marvels.com/"
 
         fun create(): MarveliciousService = create(BASE_URL.toHttpUrlOrNull()!!)
         fun create(httpUrl: HttpUrl): MarveliciousService {

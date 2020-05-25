@@ -9,6 +9,7 @@ import androidx.navigation.fragment.navArgs
 import com.example.android.marvelicious.R
 import com.example.android.marvelicious.data.Status
 import com.example.android.marvelicious.databinding.FragmentCharacterDetailBinding
+import com.google.android.material.snackbar.Snackbar
 import timber.log.Timber
 
 class CharacterDetailFragment : Fragment() {
@@ -42,21 +43,26 @@ class CharacterDetailFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         charactersViewModel.character.observe(viewLifecycleOwner, Observer {
-            Timber.d("something changed $it")
             binding.character = it
         })
 
         charactersViewModel.networkState.observe(viewLifecycleOwner, Observer {
-            Timber.d("something happend $it")
             when (it.status) {
                 Status.RUNNING -> {
-                    binding.textViewNetwork.text = it.status.name
+                    binding.progressBar.visibility = View.VISIBLE
                 }
                 Status.SUCCESS -> {
-                    binding.textViewNetwork.text = it.status.name
+                    binding.progressBar.visibility = View.GONE
                 }
                 Status.FAILED -> {
-                    binding.textViewNetwork.text = it.message
+                    binding.progressBar.visibility = View.GONE
+                    Snackbar.make(view!!, it.message.toString(), Snackbar.LENGTH_INDEFINITE).run {
+                        setAction(getString(R.string.retry)) {
+                            charactersViewModel.refresh()
+                            dismiss()
+                        }
+                        show()
+                    }
                 }
             }
         })
