@@ -76,7 +76,6 @@ class CharactersFragment : Fragment() {
         })
 
         charactersViewModel.networkState.observe(viewLifecycleOwner, Observer {
-            Timber.d("The state of the network is $it")
             binding.swipeRefresh.isRefreshing = it == NetworkState.LOADING
             adapter.setResultState(it)
         })
