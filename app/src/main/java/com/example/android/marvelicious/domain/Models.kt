@@ -1,5 +1,6 @@
 package com.example.android.marvelicious.domain
 
+import androidx.room.Database
 import com.example.android.marvelicious.data.source.database.DatabaseCharacter
 import com.example.android.marvelicious.data.source.database.DatabaseImage
 
@@ -16,7 +17,18 @@ class Models {
         val stories: Any?,
         val events: Any?,
         val series: Any?
-    )
+    ) {
+        fun asDatabaseModel(): DatabaseCharacter {
+            return DatabaseCharacter(
+                id = this.id!!,
+                name = this.name,
+                description = this.description,
+                modified = this.modified,
+                resourceURI = this.resourceURI,
+                thumbnail = this.thumbnail?.asDatabaseModel()
+            )
+        }
+    }
 
     data class Image(
         val path: String,

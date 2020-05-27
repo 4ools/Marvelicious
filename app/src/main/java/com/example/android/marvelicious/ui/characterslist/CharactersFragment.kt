@@ -1,4 +1,4 @@
-package com.example.android.marvelicious.ui
+package com.example.android.marvelicious.ui.characterslist
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.marvelicious.R
 import com.example.android.marvelicious.data.NetworkState
@@ -19,7 +20,8 @@ class CharactersFragment : Fragment() {
 
     private val charactersViewModel: CharactersViewModel by lazy {
         ViewModelProvider(
-            this, CharactersViewModel.Factory(
+            this,
+            CharactersViewModel.Factory(
                 requireActivity().application
             )
         ).get(CharactersViewModel::class.java)
@@ -42,11 +44,20 @@ class CharactersFragment : Fragment() {
         binding.lifecycleOwner = this
         binding.viewModel = charactersViewModel
 
-        adapter = CharactersDataAdapter(CharacterClick {
-            Toast.makeText(activity, "character called ${it.name}", Toast.LENGTH_SHORT).show()
-        }, NetworkStateViewHolder.OnClick {
+        adapter =
+            CharactersDataAdapter(
+                CharacterClick {
+                    Toast.makeText(activity, "character called ${it.name}", Toast.LENGTH_SHORT)
+                        .show()
+                    val action =
+                        CharactersFragmentDirections.actionCharactersFragmentToCharacterDetailFragment(
+                            it.id!!
+                        )
+                    findNavController().navigate(action)
+                },
+                NetworkStateViewHolder.OnClick {
 //            charactersViewModel.refresh()
-        })
+                })
 
         binding.charactersList.adapter = adapter
         binding.charactersList.layoutManager = LinearLayoutManager(context)
@@ -65,7 +76,6 @@ class CharactersFragment : Fragment() {
         })
 
         charactersViewModel.networkState.observe(viewLifecycleOwner, Observer {
-            Timber.d("The state of the network is $it")
             binding.swipeRefresh.isRefreshing = it == NetworkState.LOADING
             adapter.setResultState(it)
         })

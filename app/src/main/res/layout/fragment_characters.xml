@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.CharactersFragment">
+    tools:context=".ui.characterslist.CharactersFragment">
 
     <data>
 
@@ -10,7 +10,8 @@
 
         <variable
             name="viewModel"
-            type="com.example.android.marvelicious.ui.CharactersViewModel" />
+            type="com.example.android.marvelicious.ui.characterslist.CharactersViewModel" />
+
     </data>
 
 

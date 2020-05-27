@@ -10,6 +10,13 @@ data class Result(
     val refresh: suspend () -> Result
 )
 
+data class SingleResult(
+    val data: LiveData<Models.Character>,
+    val networkState: LiveData<NetworkState>,
+    val refresh: suspend () -> SingleResult
+)
+
+
 enum class Status {
     RUNNING,
     SUCCESS,

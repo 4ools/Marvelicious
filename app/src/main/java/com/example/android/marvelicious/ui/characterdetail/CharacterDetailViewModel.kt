@@ -1,7 +1,8 @@
-package com.example.android.marvelicious.ui
+package com.example.android.marvelicious.ui.characterdetail
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.android.marvelicious.data.source.MarveliciousRepository
@@ -13,7 +14,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-class CharactersViewModel(application: Application) : AndroidViewModel(application) {
+class CharacterDetailViewModel(
+    application: Application,
+    id: Int
+) : ViewModel() {
     private val viewModelJob = SupervisorJob()
     private val viewModelScope = CoroutineScope(viewModelJob + Dispatchers.Main)
 
@@ -23,8 +27,8 @@ class CharactersViewModel(application: Application) : AndroidViewModel(applicati
             LocalMarvelDataSource(getDatabase(application).charactersDao)
         )
 
-    private val characterResult = repository.refreshCharacters()
-    val characters = characterResult.data
+    private val characterResult = repository.refreshCharacter(id = id)
+    val character = characterResult.data
     val networkState = characterResult.networkState
 
     fun refresh() {
@@ -38,14 +42,16 @@ class CharactersViewModel(application: Application) : AndroidViewModel(applicati
         viewModelJob.cancel()
     }
 
-    class Factory(val app: Application) : ViewModelProvider.Factory {
+    class Factory(val app: Application, val id: Int) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(CharactersViewModel::class.java)) {
+            if (modelClass.isAssignableFrom(CharacterDetailViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return CharactersViewModel(app) as T
+                return CharacterDetailViewModel(
+                    app,
+                    id
+                ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }
     }
 }
-

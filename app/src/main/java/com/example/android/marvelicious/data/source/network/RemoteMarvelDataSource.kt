@@ -1,7 +1,11 @@
 package com.example.android.marvelicious.data.source.network
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
 import com.example.android.marvelicious.data.source.MarvelDataSource
+import com.example.android.marvelicious.domain.Models
+import timber.log.Timber
 
 class RemoteMarvelDataSource : MarvelDataSource {
     private val marvelApi by lazy {
@@ -14,14 +18,14 @@ class RemoteMarvelDataSource : MarvelDataSource {
 
     override suspend fun <T> getObjects(offset: Int, limit: Int): List<T> {
         val returnedCharacters = marvelApi.getAllCharactersAsync(
-            limit = limit ,
+            limit = limit,
             offset = offset
         ).await()
 
         return returnedCharacters.asCharacterDomainModel()!! as List<T>
     }
 
-    override fun <T> getObjectDataSource(): DataSource.Factory<Int, T> {
+    override fun <T> getObjectsDataSource(): DataSource.Factory<Int, T> {
         throw NotImplementedError()
     }
 
@@ -30,6 +34,19 @@ class RemoteMarvelDataSource : MarvelDataSource {
     }
 
     override fun deleteAllObjects() {
+        throw NotImplementedError()
+    }
+
+    override suspend fun <T> saveObject(objectToSave: T) {
+        throw NotImplementedError()
+    }
+
+    override suspend fun <T> getObject(id: Int): T {
+        val returnedCharacter = marvelApi.getCharacter(id).await()
+        return returnedCharacter.asCharacterDomainModel() as T
+    }
+
+    override fun <T> getObjectDataSource(id: Int): LiveData<T> {
         throw NotImplementedError()
     }
 }

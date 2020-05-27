@@ -13,6 +13,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 import timber.log.Timber
 
@@ -23,6 +24,11 @@ interface MarveliciousService {
         @Query("orderBy") orderBy: String = "name",
         @Query("limit") limit: Int?,
         @Query("offset") offset: Int?
+    ): Deferred<CharacterDataWrapper>
+
+    @GET("/v1/public/characters/{characterId}")
+    fun getCharacter(
+        @Path("characterId") characterId: Int
     ): Deferred<CharacterDataWrapper>
 
     companion object {
